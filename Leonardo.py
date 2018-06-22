@@ -115,8 +115,10 @@ contribution.columns=z.columns
 contribution=np.transpose(contribution)
 #jobs=pd.DataFrame(np.dot(np.dot(va_jobs,L),y_sum_HH))
 #jobs.index=va_jobs.index
-
-jobs_diag=pd.DataFrame(np.dot(np.dot(np.diag(va_jobs),L),y_sum_HH))
+jobs=pd.DataFrame(np.dot(va_jobs,diag))
+jobs.index=va_jobs.index
+jobs=jobs.loc[:,0]
+jobs_diag=pd.DataFrame(np.dot(np.dot(np.diag(jobs),L),y_sum_HH))
 jobs_diag.index=y_sum_HH.index
 
 
@@ -223,28 +225,36 @@ for i in range(len(codes)):
     jobs_plot.append(list(jobs_diag.loc[idx[codes[i],[fish_index[0],fish_index[1]],:]].values))
     jobs_plot.append(list(jobs_diag_NO.loc[idx[codes[i],[fish_index[0],fish_index[1]],:]].values))                
     jobs_plot.append(list(jobs_diag_ES.loc[idx[codes[i],[fish_index[0],fish_index[1]],:]].values))
+    print(codes[i])
+jobs_plot=[]
+"For fish_index=1"
+for i in range(len(codes)):
+    temp=[]
+    temp.append(int(jobs_diag.loc[idx[codes[i],fish_index[0],:]].values))
+    temp.append(int(jobs_diag_NO.loc[idx[codes[i],fish_index[0],:]].values))             
+    temp.append(int(jobs_diag_ES.loc[idx[codes[i],fish_index[0],:]].values))
+    jobs_plot.append(temp)
 
-
-
-
-
-width = 0.35  # the width of the bars
+ind = np.arange(3) 
+width = 0.25  # the width of the bars
 
 fig, ax = plt.subplots()
-#rects1 = ax.bar([int(jobs_plot[0][0]),int(jobs_plot[3][0]),int(jobs_plot[6][0])], width,
-#                color='SkyBlue', label='PT C_FISH')
-bar1 = ax.bar('PT',[2,2,2] ,width,
+rects1 = ax.bar(ind-width,jobs_plot[0], width,
                 color='SkyBlue', label='PT C_FISH')
-bar2 = ax.bar([4, 4, 4],, width,
-                color='Red', label='PT C_FISH')
-#rects2 = ax.bar(int(jobs_plot[1][0]), int(jobs_plot[4][0]),int(jobs_plot[7][0]), width,
-                #color='IndianRed', label='NO C_FISH')
-#rects3 = ax.bar(int(jobs_plot[2][0]), int(jobs_plot[4][0]),int(jobs_plot[8][0]), width, 
-                #color='Black', label='ES C_FISH')
+
+rects2 = ax.bar(ind,jobs_plot[1], width,
+                color='IndianRed', label='NO C_FISH')
+rects3 = ax.bar(ind+width,jobs_plot[2], width, 
+                color='Black', label='ES C_FISH')
+
 # Add some text for labels, title and custom x-axis tick labels, etc.
 ax.set_ylabel('Thousand jobs')
 ax.set_title('Job creation')
 ax.set_xticks(ind)
 ax.set_xticklabels(('PT', 'NO', 'ES'))
 ax.legend()
+fig_size[0] = 12
+fig_size[1] = 9
+plt.rcParams["figure.figsize"] = fig_size
+plt.savefig('histogram')
 plt.show()
