@@ -5,7 +5,7 @@ Created on Wed May  9 11:23:33 2018
 
 @author: leoie
 """
-
+import matplotlib.pyplot as plt
 import os
 import pandas as pd
 import numpy as np
@@ -217,3 +217,34 @@ hotspot_NO.to_csv('hotspotNO.csv',sep='\t')
 contribution_ES.to_csv('contributionES.csv',sep='\t')
 hotspot_ES.to_csv('hotspotES.csv',sep='\t')
 print(jobs_diag.sum(0),jobs_diag_NO.sum(0),jobs_diag_ES.sum(0))
+
+jobs_plot=[]
+for i in range(len(codes)):
+    jobs_plot.append(list(jobs_diag.loc[idx[codes[i],[fish_index[0],fish_index[1]],:]].values))
+    jobs_plot.append(list(jobs_diag_NO.loc[idx[codes[i],[fish_index[0],fish_index[1]],:]].values))                
+    jobs_plot.append(list(jobs_diag_ES.loc[idx[codes[i],[fish_index[0],fish_index[1]],:]].values))
+
+
+
+
+
+width = 0.35  # the width of the bars
+
+fig, ax = plt.subplots()
+#rects1 = ax.bar([int(jobs_plot[0][0]),int(jobs_plot[3][0]),int(jobs_plot[6][0])], width,
+#                color='SkyBlue', label='PT C_FISH')
+bar1 = ax.bar('PT',[2,2,2] ,width,
+                color='SkyBlue', label='PT C_FISH')
+bar2 = ax.bar([4, 4, 4],, width,
+                color='Red', label='PT C_FISH')
+#rects2 = ax.bar(int(jobs_plot[1][0]), int(jobs_plot[4][0]),int(jobs_plot[7][0]), width,
+                #color='IndianRed', label='NO C_FISH')
+#rects3 = ax.bar(int(jobs_plot[2][0]), int(jobs_plot[4][0]),int(jobs_plot[8][0]), width, 
+                #color='Black', label='ES C_FISH')
+# Add some text for labels, title and custom x-axis tick labels, etc.
+ax.set_ylabel('Thousand jobs')
+ax.set_title('Job creation')
+ax.set_xticks(ind)
+ax.set_xticklabels(('PT', 'NO', 'ES'))
+ax.legend()
+plt.show()
