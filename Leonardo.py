@@ -152,7 +152,7 @@ for i in range(len(codes)):
 delta_fish=[]
 for i in range(len(codes)):
     delta_fish.append(list(y.loc[idx[codes[i],[fish_index[0],fish_index[1]],:],\
-                  idx['PT',y_categories[1],:]].values))
+                  idx['PT',y_categories[HH],:]].values))
 
 
 #assing change in FD to other categories    
