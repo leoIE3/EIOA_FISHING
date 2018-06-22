@@ -175,7 +175,8 @@ y.at[NO2,('PT',y_categories[HH])]=float(delta_fish[0][1])/2+y.at[NO2,('PT',y_cat
 y_sum_NO=pd.DataFrame()
 for i in range(len(y_categories)):
     y_sum_NO[y_categories[i]]=y.loc[:,idx[:,y_categories[i],:]].sum(1)
-y_sum_HH_NO=y_sum_NO.iloc[:,idx[y_categories[HH]]]
+#y_sum_HH_NO=y_sum_NO.iloc[:,idx[y_categories[HH]]]
+y_sum_HH_NO=y_sum_NO.iloc[:,idx[HH]]
 Delta_r_NO=pd.DataFrame(np.dot(np.dot(np.transpose(B_co2_air),L),y_sum_HH_NO))
 y_sum_NO=y_sum_NO.sum(1)
 contribution_NO=pd.DataFrame(np.dot(np.dot(np.transpose(B_co2_air),L),np.diag(y_sum_NO)))
@@ -197,7 +198,8 @@ y.at[ES2,('PT',y_categories[HH])]=float(delta_fish[0][1])/2+y.at[ES2,('PT',y_cat
 y_sum_ES=pd.DataFrame()
 for i in range(len(y_categories)):
     y_sum_ES[y_categories[i]]=y.loc[:,idx[:,y_categories[i],:]].sum(1)
-y_sum_HH_ES=y_sum_ES.iloc[:,idx[y_categories[HH]]]
+#y_sum_HH_ES=y_sum_ES.iloc[:,idx[y_categories[HH]]]
+y_sum_HH_ES=y_sum_ES.iloc[:,idx[HH]]
 Delta_r_ES=pd.DataFrame(np.dot(np.dot(np.transpose(B_co2_air),L),y_sum_HH_ES))
 y_sum_ES=y_sum_ES.sum(1)
 contribution_ES=pd.DataFrame(np.dot(np.dot(np.transpose(B_co2_air),L),np.diag(y_sum_ES)))
