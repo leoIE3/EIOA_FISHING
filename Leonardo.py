@@ -109,6 +109,9 @@ y_sum_HH=y_sum.iloc[:,idx[HH]]
 y_sum_HH.index=y.index
 Delta_r=pd.DataFrame(np.dot(np.dot(np.transpose(B_co2_air),L),y_sum_HH))
 
+PT_eur_fish=y.loc[idx[:,[fish_index[0],fish_index[1]],:],idx['PT',y_categories[HH],:]].sum(0)
+
+
 y_sum=y_sum.sum(1)
 contribution=pd.DataFrame(np.dot(np.dot(np.transpose(B_co2_air),L),np.diag(y_sum)))
 contribution.columns=z.columns
@@ -124,6 +127,7 @@ jobs_diag.index=y_sum_HH.index
 
 B_co2_air1=B.loc[idx[B.index.values[0]],]
 hotspot=pd.DataFrame(np.dot(np.dot(np.diag(B_co2_air1),L),y_sum_HH))
+hotspot.index=B_co2_air1.index
 #contribution.columns=z.columns
 
 
@@ -136,7 +140,21 @@ for i in range(len(codes)):
     for j in range(len(fish_index)):
         CO2_fish_sector.append(np.transpose(B_co2_air).loc[:,idx[codes[i],fish_index[j],]])
 
+jobintensity=pd.DataFrame(np.dot(np.diag(jobs),L))
+jobintensity.index=jobs.index
+jobintensity.columns=z.columns
+jobintensity=jobintensity.loc[:,idx[['PT','NO','ES'],[fish_index[0],fish_index[1]],:]]
+jobintensity.to_csv('jobintensity.csv',sep='\t')
 
+jobsneeded=jobs.loc[idx[['PT','NO','ES'],[fish_index[0],fish_index[1]],:]]
+
+CO2intensity=pd.DataFrame(np.dot(np.diag(B_co2_air1),L))
+CO2intensity.index=B_co2_air1.index
+CO2intensity.columns=z.columns
+CO2intensity=CO2intensity.loc[:,idx[['PT','NO','ES'],[fish_index[0],fish_index[1]],:]]
+CO2intensity.to_csv('CO2intensity.csv',sep='\t')
+
+CO2needed=B_co2_air1.loc[idx[['PT','NO','ES'],[fish_index[0],fish_index[1]],:]]
 #%%
 #FISH
 #fish_co2.transpose()
@@ -185,6 +203,7 @@ contribution_NO=pd.DataFrame(np.dot(np.dot(np.transpose(B_co2_air),L),np.diag(y_
 contribution_NO.columns=z.columns
 contribution_NO=np.transpose(contribution_NO)
 hotspot_NO=pd.DataFrame(np.dot(np.dot(np.diag(B_co2_air1),L),y_sum_HH_NO))
+hotspot_NO.index=B_co2_air1.index
 jobs_diag_NO=pd.DataFrame(np.dot(np.dot(np.diag(jobs),L),y_sum_HH_NO))
 jobs_diag_NO.index=y_sum_HH.index
 "reset values for NO y fish related"
@@ -208,6 +227,7 @@ contribution_ES=pd.DataFrame(np.dot(np.dot(np.transpose(B_co2_air),L),np.diag(y_
 contribution_ES.columns=z.columns
 contribution_ES=np.transpose(contribution_ES)
 hotspot_ES=pd.DataFrame(np.dot(np.dot(np.diag(B_co2_air1),L),y_sum_HH_ES))
+hotspot_ES.index=B_co2_air1.index
 jobs_diag_ES=pd.DataFrame(np.dot(np.dot(np.diag(jobs),L),y_sum_HH_ES))
 jobs_diag_ES.index=y_sum_HH.index
 
@@ -220,41 +240,161 @@ contribution_ES.to_csv('contributionES.csv',sep='\t')
 hotspot_ES.to_csv('hotspotES.csv',sep='\t')
 print(jobs_diag.sum(0),jobs_diag_NO.sum(0),jobs_diag_ES.sum(0))
 
-jobs_plot=[]
-for i in range(len(codes)):
-    jobs_plot.append(list(jobs_diag.loc[idx[codes[i],[fish_index[0],fish_index[1]],:]].values))
-    jobs_plot.append(list(jobs_diag_NO.loc[idx[codes[i],[fish_index[0],fish_index[1]],:]].values))                
-    jobs_plot.append(list(jobs_diag_ES.loc[idx[codes[i],[fish_index[0],fish_index[1]],:]].values))
-    print(codes[i])
+#jobs_plot=[]
+#for i in range(len(codes)):
+#    jobs_plot.append(list(jobs_diag.loc[idx[codes[i],[fish_index[0],fish_index[1]],:]].values))
+#    jobs_plot.append(list(jobs_diag_NO.loc[idx[codes[i],[fish_index[0],fish_index[1]],:]].values))                
+#    jobs_plot.append(list(jobs_diag_ES.loc[idx[codes[i],[fish_index[0],fish_index[1]],:]].values))
+#    print(codes[i])
+
+plot={}
 jobs_plot=[]
 "For fish_index=1"
 for i in range(len(codes)):
     temp=[]
-    temp.append(int(jobs_diag.loc[idx[codes[i],fish_index[0],:]].values))
-    temp.append(int(jobs_diag_NO.loc[idx[codes[i],fish_index[0],:]].values))             
-    temp.append(int(jobs_diag_ES.loc[idx[codes[i],fish_index[0],:]].values))
+    temp.append(int(jobs_diag.loc[idx[codes[i],fish_index[0],:]].values+jobs_diag.loc[idx[codes[i],fish_index[1],:]].values))
+    temp.append(int(jobs_diag_NO.loc[idx[codes[i],fish_index[0],:]].values+jobs_diag_NO.loc[idx[codes[i],fish_index[1],:]].values))             
+    temp.append(int(jobs_diag_ES.loc[idx[codes[i],fish_index[0],:]].values+jobs_diag_ES.loc[idx[codes[i],fish_index[1],:]].values))
     jobs_plot.append(temp)
+plot['jobs1']=jobs_plot
 
 ind = np.arange(3) 
 width = 0.25  # the width of the bars
-
+fig_size=plt.rcParams["figure.figsize"] 
 fig, ax = plt.subplots()
-rects1 = ax.bar(ind-width,jobs_plot[0], width,
-                color='SkyBlue', label='PT C_FISH')
+rects1 = ax.bar(ind-width, plot['jobs1'][0], width,
+                color='SkyBlue', label='PT')
 
-rects2 = ax.bar(ind,jobs_plot[1], width,
-                color='IndianRed', label='NO C_FISH')
-rects3 = ax.bar(ind+width,jobs_plot[2], width, 
-                color='Black', label='ES C_FISH')
+rects2 = ax.bar(ind, plot['jobs1'][1], width,
+                color='IndianRed', label='NO')
+rects3 = ax.bar(ind+width, plot['jobs1'][2], width, 
+                color='Orange', label='ES')
 
 # Add some text for labels, title and custom x-axis tick labels, etc.
 ax.set_ylabel('Thousand jobs')
-ax.set_title('Job creation')
+ax.set_title('Job changes')
 ax.set_xticks(ind)
-ax.set_xticklabels(('PT', 'NO', 'ES'))
+ax.set_xticklabels(('Base case', 'Import from NO', 'Import from ES'))
+ax.legend()
+fig_size[0] = 15
+fig_size[1] = 12
+plt.rcParams["figure.figsize"] =fig_size
+plt.savefig('histogram')
+plt.show()
+
+
+jobs_plot2=[]
+for i in range(len(jobs_plot)):
+    temp=[]
+    temp.append((jobs_plot[i][0]/jobs_plot[i][0])*1)
+    temp.append((jobs_plot[i][1]/jobs_plot[i][0]-1)*100)
+    temp.append((jobs_plot[i][2]/jobs_plot[i][0]-1)*100)
+    jobs_plot2.append(temp)
+plot['jobs2']=jobs_plot2
+
+ind = np.arange(3) 
+fig, ax = plt.subplots()
+rects1 = ax.bar(ind-width, plot['jobs2'][0], width,
+                color='SkyBlue', label='PT')
+
+rects2 = ax.bar(ind,plot['jobs2'][1], width,
+                color='IndianRed', label='NO')
+rects3 = ax.bar(ind+width,plot['jobs2'][2], width, 
+                color='Orange', label='ES')
+
+ax.set_ylabel('% job Change')
+ax.set_title('Job Changes in %')
+ax.set_xticks(ind)
+ax.set_xticklabels(( 'Base case','Import from NO', 'Import from ES'))
 ax.legend()
 fig_size[0] = 9
 fig_size[1] = 6
-#plt.rcParams["figure.figsize"] = fig_size
-plt.savefig('histogram')
+plt.rcParams["figure.figsize"] =fig_size
+plt.savefig('%')
 plt.show()
+
+
+"CO2 plots"
+co2_plot=[]
+for i in range(len(codes)):
+    temp=[]
+    temp.append(int(hotspot.loc[idx[codes[i],fish_index[0],:]].values+hotspot.loc[idx[codes[i],fish_index[1],:]].values)/1e6)
+    temp.append(int(hotspot_NO.loc[idx[codes[i],fish_index[0],:]].values+hotspot_NO.loc[idx[codes[i],fish_index[1],:]].values)/1e6)             
+    temp.append(int(hotspot_ES.loc[idx[codes[i],fish_index[0],:]].values+hotspot_ES.loc[idx[codes[i],fish_index[1],:]].values)/1e6)
+    co2_plot.append(temp)
+plot['co21']=co2_plot
+
+fig_size=plt.rcParams["figure.figsize"] 
+ind = np.arange(3) 
+fig, ax = plt.subplots()
+rects1 = ax.bar(ind-width, plot['co21'][0], width,
+                color='SkyBlue', label='PT')
+
+rects2 = ax.bar(ind,plot['co21'][1], width,
+                color='IndianRed', label='NO')
+rects3 = ax.bar(ind+width,plot['co21'][2], width, 
+                color='Orange', label='ES')
+
+ax.set_ylabel('kt')
+ax.set_title('CO2 emissions in thousand metric tons from the fishing industry')
+ax.set_xticks(ind)
+ax.set_xticklabels(('Base case', 'Import from NO', 'Import from ES'))
+ax.legend()
+fig_size[0] = 9
+fig_size[1] = 6
+plt.rcParams["figure.figsize"] =fig_size
+plt.savefig('CO2 kg fish')
+plt.show()
+
+
+co2_plot2=[]
+for i in range(len(jobs_plot)):
+    temp=[]
+    temp.append((co2_plot[i][0]/co2_plot[i][0])*1)
+    temp.append((co2_plot[i][1]/co2_plot[i][0]-1)*100)
+    temp.append((co2_plot[i][2]/co2_plot[i][0]-1)*100)
+    co2_plot2.append(temp)
+plot['co22']=co2_plot2
+
+ind = np.arange(3) 
+fig, ax = plt.subplots()
+rects1 = ax.bar(ind-width, plot['co22'][0], width,
+                color='SkyBlue', label='PT')
+
+rects2 = ax.bar(ind,plot['co22'][1], width,
+                color='IndianRed', label='NO')
+rects3 = ax.bar(ind+width,plot['co22'][2], width, 
+                color='Orange', label='ES')
+
+ax.set_ylabel('% CO2 emission change')
+ax.set_title('CO2 emission changes in the fishing sector %')
+ax.set_xticks(ind)
+ax.set_xticklabels(( 'Base case','Import from NO', 'Import from ES'))
+ax.legend()
+plt.savefig('CO2%')
+plt.show()
+
+
+#plot['co23']=[int((Delta_r.sum(1)-Delta_r.sum(1))/1e6),int((Delta_r_NO.sum(1)-Delta_r.sum(1))/1e6),int((Delta_r_ES.sum(1)-Delta_r.sum(1))/1e6)]
+#
+#fig_size=plt.rcParams["figure.figsize"] 
+#ind = np.arange(3) 
+#fig, ax = plt.subplots()
+##rects1 = ax.bar(ind, plot['co23'], width,
+##                color='Green' )
+#plt.bar(range(2), plot['co23'][1:], width,align='center')
+##rects2 = ax.bar(ind,plot['co23'][1], width,
+##                color='Green')
+##rects3 = ax.bar(ind,plot['co23'][2], width, 
+##                color='Blue')
+#
+#ax.set_ylabel('kt')
+#ax.set_title('Total CO2 emissions in thousand metric tons')
+#ax.set_xticks(ind)
+#ax.set_xticklabels(('Base case', 'Import from NO', 'Import from ES'))
+#ax.legend()
+#fig_size[0] = 9
+#fig_size[1] = 6
+#plt.rcParams["figure.figsize"] =fig_size
+#plt.savefig('CO2 total')
+#plt.show()
