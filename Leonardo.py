@@ -185,7 +185,7 @@ contribution_NO=pd.DataFrame(np.dot(np.dot(np.transpose(B_co2_air),L),np.diag(y_
 contribution_NO.columns=z.columns
 contribution_NO=np.transpose(contribution_NO)
 hotspot_NO=pd.DataFrame(np.dot(np.dot(np.diag(B_co2_air1),L),y_sum_HH_NO))
-jobs_diag_NO=pd.DataFrame(np.dot(np.dot(np.diag(va_jobs),L),y_sum_HH_NO))
+jobs_diag_NO=pd.DataFrame(np.dot(np.dot(np.diag(jobs),L),y_sum_HH_NO))
 jobs_diag_NO.index=y_sum_HH.index
 "reset values for NO y fish related"
 
@@ -208,7 +208,7 @@ contribution_ES=pd.DataFrame(np.dot(np.dot(np.transpose(B_co2_air),L),np.diag(y_
 contribution_ES.columns=z.columns
 contribution_ES=np.transpose(contribution_ES)
 hotspot_ES=pd.DataFrame(np.dot(np.dot(np.diag(B_co2_air1),L),y_sum_HH_ES))
-jobs_diag_ES=pd.DataFrame(np.dot(np.dot(np.diag(va_jobs),L),y_sum_HH_ES))
+jobs_diag_ES=pd.DataFrame(np.dot(np.dot(np.diag(jobs),L),y_sum_HH_ES))
 jobs_diag_ES.index=y_sum_HH.index
 
 contribution.to_csv('contribution.csv',sep='\t')
@@ -253,8 +253,8 @@ ax.set_title('Job creation')
 ax.set_xticks(ind)
 ax.set_xticklabels(('PT', 'NO', 'ES'))
 ax.legend()
-fig_size[0] = 12
-fig_size[1] = 9
-plt.rcParams["figure.figsize"] = fig_size
+fig_size[0] = 9
+fig_size[1] = 6
+#plt.rcParams["figure.figsize"] = fig_size
 plt.savefig('histogram')
 plt.show()
